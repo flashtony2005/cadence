@@ -637,14 +637,27 @@ type (
 		EmitMetric bool
 	}
 
+	// DomainReplicationConfig describes the cross DC domain replication configuration
+	DomainReplicationConfig struct {
+		ActiveClusterName string
+		FailoverVersion   int64
+		Clusters          []*ClusterReplicationConfig
+	}
+
+	// ClusterReplicationConfig describes the cross DC cluster replication configuration
+	ClusterReplicationConfig struct {
+		ClusterName string
+	}
+
 	// CreateDomainRequest is used to create the domain
 	CreateDomainRequest struct {
-		Name        string
-		Status      int
-		Description string
-		OwnerEmail  string
-		Retention   int32
-		EmitMetric  bool
+		Name              string
+		Status            int
+		Description       string
+		OwnerEmail        string
+		Retention         int32
+		EmitMetric        bool
+		ReplicationConfig *DomainReplicationConfig
 	}
 
 	// CreateDomainResponse is the response for CreateDomain
@@ -660,14 +673,16 @@ type (
 
 	// GetDomainResponse is the response for GetDomain
 	GetDomainResponse struct {
-		Info   *DomainInfo
-		Config *DomainConfig
+		Info              *DomainInfo
+		Config            *DomainConfig
+		ReplicationConfig *DomainReplicationConfig
 	}
 
 	// UpdateDomainRequest is used to update domain
 	UpdateDomainRequest struct {
-		Info   *DomainInfo
-		Config *DomainConfig
+		Info              *DomainInfo
+		Config            *DomainConfig
+		ReplicationConfig *DomainReplicationConfig
 	}
 
 	// DeleteDomainRequest is used to delete domain entry from domains table
@@ -995,4 +1010,14 @@ func NewSerializedHistoryEventBatch(data []byte, encoding common.EncodingType, v
 func (h *SerializedHistoryEventBatch) String() string {
 	return fmt.Sprintf("[encodingType:%v,historyVersion:%v,history:%v]",
 		h.EncodingType, h.Version, string(h.Data))
+}
+
+func (config *ClusterReplicationConfig) serialize() map[string]interface{} {
+	output := make(map[string]interface{})
+	output["cluster_name"] = config.ClusterName
+	return output
+}
+
+func (config *ClusterReplicationConfig) deserialize(input map[string]interface{}) {
+	config.ClusterName = input["cluster_name"].(string)
 }

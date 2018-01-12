@@ -145,3 +145,19 @@ install-schema: bins
 	./cadence-cassandra-tool --ep 127.0.0.1 create -k "cadence_visibility" --rf 1
 	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility setup-schema -v 0.0
 	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility update-schema -d ./schema/visibility/versioned
+
+install-schema-cross-dc: bins
+	@echo Setting up cadence key space
+	./cadence-cassandra-tool --ep 127.0.0.1 create -k "cadence" --rf 1
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence setup-schema -v 0.0
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence update-schema -d ./schema/cadence/versioned
+	./cadence-cassandra-tool --ep 127.0.0.1 create -k "cadence_visibility" --rf 1
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility setup-schema -v 0.0
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility update-schema -d ./schema/visibility/versioned
+	@echo Setting up cadence_standby key space
+	./cadence-cassandra-tool --ep 127.0.0.1 create -k "cadence_standby" --rf 1
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_standby setup-schema -v 0.0
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_standby update-schema -d ./schema/cadence/versioned
+	./cadence-cassandra-tool --ep 127.0.0.1 create -k "cadence_visibility_standby" --rf 1
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility_standby setup-schema -v 0.0
+	./cadence-cassandra-tool -ep 127.0.0.1 -k cadence_visibility_standby update-schema -d ./schema/visibility/versioned
